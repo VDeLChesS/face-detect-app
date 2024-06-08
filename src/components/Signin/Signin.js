@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 
-class Signin extends React.Component {
+class Signin extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,7 +21,7 @@ class Signin extends React.Component {
   onSubmitSignIn = () => {
     fetch('http://localhost:3000/signin', {
       method: 'post',
-      headers: {'Content-Type': 'application/json'},
+      header: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         email: this.state.signInEmail,
         password: this.state.signInPassword
@@ -65,7 +65,7 @@ class Signin extends React.Component {
                 />
               </div>
             </fieldset>
-            <div className="">
+            <div className="lh-copy mt3">
               <input
                 onClick={this.onSubmitSignIn}
                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"

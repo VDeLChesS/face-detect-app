@@ -1,10 +1,6 @@
-const express = require('express');
-const bcrypt = require('bcrypt-nodejs');
-
-const app = express();
-
-
-app.use(express.json());
+import express, { json } from 'express';
+import { hash as _hash } from 'bcrypt-nodejs';
+import cors from 'cors';
 
 const database = {
     users: [
@@ -38,28 +34,38 @@ const database = {
     ]
 }
 
+const app = express();
+
+
+app.use(cors());
+app.use(express.json());
+
 app.get('/', (req, res) => {
-    res.send("This is working");
+    res.send("database.users");
 });
 
 app.post('/signin', (req, res) => {
-    bcrypt.compare("apples", "$2a$10$Z19F3TH2WLiXNLlA.QSihuZrAZyzw/Nu99tIDdRhR8JGPvvFwiX3G", function(err, res) {
-        console.log('first guess', res);
-    });
-    bcrypt.compare("veggies", "$2a$10$Z19F3TH2WLiXNLlA.QSihuZrAZyzw/Nu99tIDdRhR8JGPvvFwiX3G", function(err, res) {
-        console.log('second guess', res);
-    });
-    if (req.body.email === database.users[0].email &&
-        req.body.password === database.users[0].password) {
-        res.json('success');
-    } else {
-        res.status(400).json('error logging in');
-    }
-});
+  db.select('email', 'hash').from('login')
+    .where('email', '=', req.body.email)
+    .then(data => {
+      const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
+      if (isValid) {
+        return db.select('*').from('users')
+          .where('email', '=', req.body.email)
+          .then(user => {
+            res.json(user[0])
+          })
+          .catch(err => res.status(400).json('unable to get user'))
+      } else {
+        res.status(400).json('wrong credentials')
+      }
+    })
+    .catch(err => res.status(400).json('wrong credentials'))
+})
 
 app.post('/register', (req, res) => {
     const { email, name, password } = req.body;
-    bcrypt.hash(password, null, null, function(err, hash) {
+    _hash(password, null, null, function(err, hash) {
         console.log(hash);
     });
     database.users.push({

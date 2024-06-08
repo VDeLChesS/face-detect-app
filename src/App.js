@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import 'tachyons';
 // import Particles from 'react-particles-js';
 import ParticlesBg from 'particles-bg'
 import Clarifai from 'clarifai';
@@ -36,7 +37,7 @@ class App extends Component {
       input: '',
       imageUrl: '',
       box: {},
-      route: 'home',
+      route: 'signin',
       isSignedIn: false,
       user: {
         id: '',
@@ -58,6 +59,12 @@ class App extends Component {
         joined: data.joined
       }
     })
+  }
+
+  componentDidMount() {
+    fetch('http://localhost:3000/')
+      .then(response => response.json())
+      .then(console.log)
   }
 
   calculateFaceLocation = (data) => {
@@ -116,6 +123,10 @@ class App extends Component {
       this.setState({ isSignedIn: false })
     } else if (route === 'home') {
       this.setState({ isSignedIn: true })
+    } else if (route === 'signin') {
+      this.setState({ isSignedIn: false })
+    } else if (route === 'register') {
+      this.setState({ isSignedIn: false })
     }
     this.setState({ route: route });
   }
@@ -124,15 +135,12 @@ class App extends Component {
     const { isSignedIn, imageUrl, route, box } = this.state;
     return (
       <div className="App">
-        <ParticlesBg type="fountain" bg={true} />
+        <ParticlesBg type="cobweb" bg={true} />
         <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
         {route === 'home'
           ? <div>
             <Logo />
-            <Rank
-              name={this.state.user.name}
-              entries={this.state.user.entries}
-            />
+            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onButtonSubmit={this.onButtonSubmit}
@@ -141,7 +149,7 @@ class App extends Component {
           </div>
           : (
             route === 'signin'
-              ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+              ? <Signin onRouteChange={this.onRouteChange} />
               : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
           )
         }
